@@ -1,2 +1,4 @@
 .venv
 not-push
+lab2/data
+__pycache__

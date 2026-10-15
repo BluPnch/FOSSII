@@ -185,7 +185,7 @@ def main():
 
     parser.add_argument("--epochs", type=int, default=60)
     parser.add_argument("--lr", type=float, default=0.01)
-    parser.add_argument("--lr-decay", type=float, default=1.0)
+    parser.add_argument("--lr-decay", type=float, default=0.95)
     parser.add_argument("--target-loss", type=float, default=0.0001)
     parser.add_argument("--seed", type=int, default=42)
 

@@ -3,7 +3,7 @@ import numpy as np
 from layers import (
     Conv2D,
     ReLU,
-    MaxPool2D,
+    AvgPool2D,
     Flatten,
     Dense
 )
@@ -47,30 +47,42 @@ class SoftmaxCrossEntropy:
 
 
 class CNN:
+    """
+        2 свёрточных слоя        
+        16 и 32 фильтра 3×3      
+        average-пулинг 2×2       
+
+    Формы:
+
+        (1, 28, 28) → conv1 (16, 26, 26) → pool1 (16, 13, 13)
+                    → conv2 (32, 11, 11) → pool2 (32, 5, 5)
+                    → flatten (800,) → fc1 (64,) → fc2 (10,)
+    """
+
     def __init__(self):
 
         self.conv1 = Conv2D(
             input_channels=1,
-            num_filters=8,
+            num_filters=16,
             kernel_size=3
         )
 
         self.relu1 = ReLU()
 
-        self.pool1 = MaxPool2D(
+        self.pool1 = AvgPool2D(
             pool_size=2,
             stride=2
         )
 
         self.conv2 = Conv2D(
-            input_channels=8,
-            num_filters=16,
+            input_channels=16,
+            num_filters=32,
             kernel_size=3
         )
 
         self.relu2 = ReLU()
 
-        self.pool2 = MaxPool2D(
+        self.pool2 = AvgPool2D(
             pool_size=2,
             stride=2
         )
@@ -78,7 +90,7 @@ class CNN:
         self.flatten = Flatten()
 
         self.fc1 = Dense(
-            input_size=400,
+            input_size=800,
             output_size=64
         )
 

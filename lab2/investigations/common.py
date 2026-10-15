@@ -18,7 +18,7 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.lib.stride_tricks import sliding_window_view
+from matplotlib.ticker import MaxNLocator
 
 # Слои, функция ошибки, данные и метрики берутся из основной лабораторной
 SOURCE_DIR = Path(__file__).resolve().parent.parent / "source"
@@ -26,7 +26,14 @@ sys.path.insert(0, str(SOURCE_DIR))
 
 from cnn import SoftmaxCrossEntropy  # noqa: E402
 from data_preparation import prepare_data  # noqa: E402
-from layers import Conv2D, ReLU, MaxPool2D, Flatten, Dense  # noqa: E402
+from layers import (  # noqa: E402
+    Conv2D,
+    ReLU,
+    MaxPool2D,
+    AvgPool2D,
+    Flatten,
+    Dense,
+)
 from metrics import (  # noqa: E402
     confusion_matrix,
     classification_metrics,
@@ -40,70 +47,6 @@ RESULTS_ROOT = (
 )
 
 SURFACE = "#fcfcfb"
-
-
-class AvgPool2D:
-    """
-    Average Pooling: из каждого окна берётся среднее, а не максимум.
-
-    Например:
-
-        [1  5]
-        [3  3]
-
-    превращается в:
-
-        [3]
-
-    Используется только в исследовании типа пулинга,
-    основная сеть работает с MaxPool2D.
-    """
-
-    def __init__(self, pool_size=2, stride=2):
-        self.pool_size = pool_size
-        self.stride = stride
-
-    def forward(self, x):
-
-        self.input_shape = x.shape
-
-        # Все окна сразу:
-        # (channels, out_height, out_width, pool_size, pool_size)
-        windows = sliding_window_view(
-            x,
-            (self.pool_size, self.pool_size),
-            axis=(1, 2)
-        )[:, ::self.stride, ::self.stride]
-
-        return windows.mean(axis=(3, 4))
-
-    def backward(self, grad):
-        """
-        Каждый элемент окна вошёл в среднее с весом 1 / (pool_size²),
-        поэтому градиент делится поровну между всеми элементами окна.
-
-        Если окна перекрываются, элемент получает вклад от каждого
-        окна, в которое попал.
-        """
-
-        dx = np.zeros(self.input_shape)
-
-        _, out_height, out_width = grad.shape
-
-        share = grad / (self.pool_size * self.pool_size)
-
-        # Элемент окна (a, b) - это вход со сдвигом (a, b)
-        # от левого верхнего угла окна
-        for a in range(self.pool_size):
-            for b in range(self.pool_size):
-
-                dx[
-                    :,
-                    a:a + self.stride * (out_height - 1) + 1:self.stride,
-                    b:b + self.stride * (out_width - 1) + 1:self.stride
-                ] += share
-
-        return dx
 
 
 class SequentialCNN:
@@ -399,16 +342,24 @@ def label_line_ends(ax, ends, min_gap_px=16):
         )
 
 
-def plot_history(results, key, title, ylabel, path, log=False, percent=False):
+def plot_history(
+    results, key, title, ylabel, path,
+    log=False, percent=False, target=None,
+):
     """
     Линейный график показателя по эпохам, по линии на вариант.
 
-    key - поле из history: "train_loss" или "test_accuracy".
+    key    - поле из history: "train_loss" или "test_accuracy".
+    target - если задано, рисуется пунктир целевого значения.
+
+    Число эпох у вариантов может различаться.
     """
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
     ends = []
+
+    max_epochs = max(len(r["history"][key]) for r in results)
 
     for result in results:
 
@@ -428,26 +379,50 @@ def plot_history(results, key, title, ylabel, path, log=False, percent=False):
             label=result["label"],
         )
 
-        value_text = f"{values[-1]:.2f} %" if percent else f"{values[-1]:.4f}"
+        if percent:
+            value_text = f"{values[-1]:.2f} %"
+        elif values[-1] < 0.001:
+            value_text = f"{values[-1]:.6f}"
+        else:
+            value_text = f"{values[-1]:.4f}"
 
         ends.append((epochs[-1], values[-1], f"{result['label']}: {value_text}"))
 
     if log:
         ax.set_yscale("log")
 
+    if target is not None:
+        ax.axhline(target, color=MUTED, linewidth=1, linestyle="--")
+        ax.annotate(
+            f"цель {target:g}",
+            xy=(1, target),
+            xytext=(0, 5),
+            textcoords="offset points",
+            color=MUTED,
+        )
+
     ax.set_xlabel("Эпоха")
-    ax.set_xticks(epochs)
-    ax.margins(x=0.3)
+
+    if max_epochs <= 10:
+        ax.set_xticks(np.arange(1, max_epochs + 1))
+    else:
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    # Справа запас под подписи концов линий
+    ax.set_xlim(0.5, max_epochs + max(1.5, 0.3 * max_epochs))
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.legend(loc="lower left" if log else "lower right")
+
+    # Ошибка убывает - правый верхний угол свободен;
+    # accuracy растёт - свободен правый нижний
+    ax.legend(loc="upper right" if log else "lower right")
 
     label_line_ends(ax, ends)
 
     save(fig, path)
 
 
-def plot_loss(results, title, path):
+def plot_loss(results, title, path, target=None):
     plot_history(
         results,
         "train_loss",
@@ -455,6 +430,7 @@ def plot_loss(results, title, path):
         "Средняя ошибка (cross-entropy), логарифмическая шкала",
         path,
         log=True,
+        target=target,
     )
 
 
@@ -482,8 +458,8 @@ def plot_summary(results, path):
     panels = [
         ("Обучаемых параметров", lambda r: r["parameters"]),
         (
-            "Время эпохи, с",
-            lambda r: np.mean(r["history"]["epoch_seconds"]),
+            "Время эпохи (медиана), с",
+            lambda r: np.median(r["history"]["epoch_seconds"]),
         ),
         (
             f"Ошибок на тесте (из {test_size:,})".replace(",", " "),
@@ -587,7 +563,7 @@ def print_table(results):
             f"{r['label']:16s} "
             f"{r['parameters']:9d}  "
             f"{r['dense_inputs']:9d}  "
-            f"{np.mean(r['history']['epoch_seconds']):9.1f} с  "
+            f"{np.median(r['history']['epoch_seconds']):9.1f} с  "
             f"{r['ms_per_image']:9.3f}  "
             f"{r['accuracy']:8.4f}  "
             f"{r['macro_f1']:10.4f}  "

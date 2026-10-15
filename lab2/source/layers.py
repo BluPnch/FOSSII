@@ -27,7 +27,7 @@ class Flatten:
 
     Например:
 
-        (16, 7, 7) -> (784,)
+        (32, 5, 5) -> (800,)
     """
 
     def forward(self, x):
@@ -161,6 +161,72 @@ class MaxPool2D:
         dx = np.zeros_like(self.x)
 
         np.add.at(dx, self.max_positions, grad)
+
+        return dx
+
+
+class AvgPool2D:
+    """
+    Average Pooling 2x2.
+
+    Например:
+
+        [1  5]
+        [3  3]
+
+    превращается в:
+
+        [3]
+    """
+
+    def __init__(self, pool_size=2, stride=2):
+        self.pool_size = pool_size
+        self.stride = stride
+
+    def forward(self, x):
+        """
+        x имеет форму:
+
+            (channels, height, width)
+        """
+
+        self.input_shape = x.shape
+
+        # Все окна сразу:
+        # (channels, out_height, out_width, pool_size, pool_size)
+        windows = sliding_window_view(
+            x,
+            (self.pool_size, self.pool_size),
+            axis=(1, 2)
+        )[:, ::self.stride, ::self.stride]
+
+        return windows.mean(axis=(3, 4))
+
+    def backward(self, grad):
+        """
+        Каждый элемент окна вошёл в среднее с весом 1 / (pool_size²),
+        поэтому градиент делится поровну между всеми элементами окна.
+
+        Если окна перекрываются, элемент получает вклад от каждого
+        окна, в которое попал.
+        """
+
+        dx = np.zeros(self.input_shape)
+
+        _, out_height, out_width = grad.shape
+
+        share = grad / (self.pool_size * self.pool_size)
+
+        # Элемент окна (a, b) - это вход со сдвигом (a, b)
+        # от левого верхнего угла окна
+        for a in range(self.pool_size):
+            for b in range(self.pool_size):
+
+                dx[
+                    :,
+                    a:a + self.stride * (out_height - 1) + 1:self.stride,
+                    b:b + self.stride * (out_width - 1) + 1:self.stride
+                ] += share
 
         return dx
 

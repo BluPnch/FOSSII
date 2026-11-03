@@ -1,0 +1,23 @@
+optimal: resume after 38 epochs; train=49000, test=21000
+optimal: epoch 39/60, loss=0.0000984250, lr=0.00142396, seconds=72.9
+optimal: epoch 40/60, loss=0.0000942306, lr=0.00135276, seconds=72.3
+optimal: epoch 41/60, loss=0.0000924627, lr=0.00128512, seconds=70.6
+optimal: epoch 42/60, loss=0.0000911241, lr=0.00122087, seconds=71.5
+optimal: epoch 43/60, loss=0.0000900034, lr=0.00115982, seconds=70.3
+optimal: epoch 44/60, loss=0.0000886855, lr=0.00110183, seconds=70.7
+optimal: epoch 45/60, loss=0.0000873699, lr=0.00104674, seconds=70.2
+optimal: epoch 46/60, loss=0.0000861558, lr=0.00099440, seconds=74.7
+optimal: epoch 47/60, loss=0.0000849425, lr=0.00094468, seconds=69.6
+optimal: epoch 48/60, loss=0.0000837497, lr=0.00089745, seconds=68.9
+optimal: epoch 49/60, loss=0.0000826589, lr=0.00085258, seconds=69.9
+optimal: epoch 50/60, loss=0.0000820924, lr=0.00080995, seconds=70.3
+optimal: epoch 51/60, loss=0.0000809037, lr=0.00076945, seconds=68.2
+optimal: epoch 52/60, loss=0.0000803376, lr=0.00073098, seconds=68.8
+optimal: epoch 53/60, loss=0.0000795026, lr=0.00069443, seconds=69.0
+optimal: epoch 54/60, loss=0.0000784504, lr=0.00065971, seconds=69.6
+optimal: epoch 55/60, loss=0.0000782635, lr=0.00062672, seconds=69.8
+optimal: epoch 56/60, loss=0.0000775743, lr=0.00059539, seconds=71.9
+optimal: epoch 57/60, loss=0.0000769500, lr=0.00056562, seconds=68.8
+optimal: epoch 58/60, loss=0.0000763945, lr=0.00053734, seconds=66.8
+optimal: epoch 59/60, loss=0.0000755717, lr=0.00051047, seconds=67.5
+optimal: epoch 60/60, loss=0.0000755849, lr=0.00048495, seconds=66.2

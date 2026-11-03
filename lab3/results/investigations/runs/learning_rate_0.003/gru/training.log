@@ -1,0 +1,7 @@
+GRU 001: train=0.30773, val=0.12615
+GRU 010: train=0.11034, val=0.08464
+GRU 020: train=0.09091, val=0.07491
+GRU 030: train=0.08553, val=0.07332
+GRU 040: train=0.08294, val=0.07407
+GRU 050: train=0.08006, val=0.07308
+GRU 060: train=0.07721, val=0.07542

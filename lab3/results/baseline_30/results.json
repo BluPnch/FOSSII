@@ -1,0 +1,92 @@
+{
+  "config": {
+    "data": "C:\\ITMO\\sem1\\FOSSII\\lab3\\data\\Steel_industry_data.csv",
+    "output": "C:\\ITMO\\sem1\\FOSSII\\lab3\\results",
+    "epochs": 30,
+    "window": 24,
+    "hidden_size": 32,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "patience": 7,
+    "seed": 42,
+    "threads": 2
+  },
+  "data_sha256": "9b1cee6f9cb9cd9df2b95814ca90a9a2ff15b7f5f1fba0fae3c643e82072eacc",
+  "data": {
+    "rows": 35040,
+    "window": 24,
+    "mean": 28.69404411315918,
+    "std": 34.39114761352539,
+    "features": [
+      "Usage_kWh",
+      "time_sin",
+      "time_cos",
+      "weekday_sin",
+      "weekday_cos"
+    ],
+    "splits": {
+      "train": {
+        "samples": 24504,
+        "first_target": "2018-01-01 06:00:00",
+        "last_target": "2018-09-13 11:45:00"
+      },
+      "val": {
+        "samples": 5256,
+        "first_target": "2018-09-13 12:00:00",
+        "last_target": "2018-11-07 05:45:00"
+      },
+      "test": {
+        "samples": 5256,
+        "first_target": "2018-11-07 06:00:00",
+        "last_target": "2018-12-31 23:45:00"
+      }
+    }
+  },
+  "training": {
+    "RNN": {
+      "best_epoch": 28,
+      "epochs_run": 30,
+      "training_seconds": 30.451317100028973,
+      "parameters": 1281
+    },
+    "GRU": {
+      "best_epoch": 30,
+      "epochs_run": 30,
+      "training_seconds": 55.72405009996146,
+      "parameters": 3777
+    },
+    "LSTM": {
+      "best_epoch": 28,
+      "epochs_run": 30,
+      "training_seconds": 60.34394099999918,
+      "parameters": 5025
+    }
+  },
+  "metrics": {
+    "Persistence": {
+      "MSE": 135.7298117579909,
+      "RMSE": 11.650313805129494,
+      "R2": 0.8602949864578481
+    },
+    "RNN": {
+      "MSE": 95.86061879759151,
+      "RMSE": 9.790843620321565,
+      "R2": 0.9013318527903422
+    },
+    "GRU": {
+      "MSE": 83.95567683001198,
+      "RMSE": 9.16273304369455,
+      "R2": 0.9135854620546409
+    },
+    "LSTM": {
+      "MSE": 68.51096096111804,
+      "RMSE": 8.27713482801374,
+      "R2": 0.9294825167375557
+    }
+  },
+  "versions": {
+    "torch": "2.11.0+cpu",
+    "numpy": "2.4.4",
+    "pandas": "2.3.3"
+  }
+}

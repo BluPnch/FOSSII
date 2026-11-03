@@ -4,7 +4,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 
 class ReLU:
     """
-    ReLU activation function.
+    ReLU функция активации.
 
     forward:
         y = max(0, x)
@@ -25,9 +25,7 @@ class Flatten:
     """
     Преобразует многомерный тензор в одномерный.
 
-    Например:
-
-        (32, 5, 5) -> (800,)
+    (32, 5, 5) -> (800,)
     """
 
     def forward(self, x):

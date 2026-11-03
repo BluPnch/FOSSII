@@ -1,11 +1,10 @@
 """
 Итоговое сравнение: первая модель против модели с оптимальными параметрами.
 
-Сравниваются три набора сохранённых весов:
+Сравниваются два набора сохранённых весов, обе модели обучены до цели:
 
-    первая модель, 4 эпохи        results/archive_4_epochs/weights.npz
-    первая модель, до цели        results/archive_baseline/weights.npz
-    оптимальная модель, до цели   results/weights.npz
+    первая модель        results/archive_baseline/weights.npz
+    оптимальная модель   results/weights.npz
 
 Архитектура первой модели:      conv(8) → max-пулинг 2×2 → conv(16) → max-пулинг 2×2
 Архитектура оптимальной модели: conv(16) → avg-пулинг 2×2 → conv(32) → avg-пулинг 2×2
@@ -46,16 +45,8 @@ RESULTS_DIR = RESULTS_ROOT.parent
 
 MODELS = [
     {
-        "key": "first_4_epochs",
-        "label": "первая, 4 эпохи",
-        "weights": RESULTS_DIR / "archive_4_epochs" / "weights.npz",
-        "filters": [8, 16],
-        "pools": [True, True],
-        "color": "#898781",
-    },
-    {
         "key": "first_full",
-        "label": "первая, до цели",
+        "label": "первая",
         "weights": RESULTS_DIR / "archive_baseline" / "weights.npz",
         "filters": [8, 16],
         "pools": [True, True],
@@ -130,23 +121,25 @@ def evaluate_model(spec, x_test, y_test):
 
 def plot_errors_bar(results, path):
     """
-    Ошибки на тесте и итоговая средняя ошибка обучения - две панели,
+    Ошибки на тесте и число эпох до цели - две панели,
     потому что у величин разные единицы.
+
+    Итоговая ошибка обучения не показана: обе модели
+    остановились на ней же, около 0.0001.
     """
 
-    fig, (ax_err, ax_loss) = plt.subplots(1, 2, figsize=(12, 4.5))
+    fig, (ax_err, ax_epochs) = plt.subplots(1, 2, figsize=(12, 4.5))
 
     labels = [r["label"] for r in results]
     colors = [r["color"] for r in results]
 
     errors = [r["errors"] for r in results]
-    losses = [r["final_loss"] for r in results]
+    epochs = [r["epochs"] for r in results]
 
     for ax, values, title, fmt in [
         (ax_err, errors, f"Ошибок на тесте (из {results[0]['test_size']:,})"
          .replace(",", " "), "{:.0f}"),
-        (ax_loss, losses, "Средняя ошибка в последней эпохе обучения",
-         "{:.6f}"),
+        (ax_epochs, epochs, "Эпох до средней ошибки 0.0001", "{:.0f}"),
     ]:
 
         bars = ax.bar(
@@ -167,12 +160,7 @@ def plot_errors_bar(results, path):
 
         ax.set_title(title)
         ax.grid(axis="x", visible=False)
-
-    ax_err.set_ylim(0, max(errors) * 1.15)
-
-    # Ошибка обучения отличается на порядки - логарифмическая шкала
-    ax_loss.set_yscale("log")
-    ax_loss.set_ylim(min(losses) / 3, max(losses) * 3)
+        ax.set_ylim(0, max(values) * 1.15)
 
     save(fig, path)
 

@@ -1,0 +1,69 @@
+{
+  "name": "hidden_size_16",
+  "kind": "RNN",
+  "config": {
+    "window": 24,
+    "hidden_size": 16,
+    "learning_rate": 0.001,
+    "batch_size": 256,
+    "seed": 42
+  },
+  "signature": {
+    "window": 24,
+    "hidden_size": 16,
+    "learning_rate": 0.001,
+    "batch_size": 256,
+    "seed": 42,
+    "epochs": 100,
+    "min_epochs": 60,
+    "patience": 25,
+    "log_every": 10,
+    "threads": 1,
+    "kind": "RNN",
+    "sha256": "9b1cee6f9cb9cd9df2b95814ca90a9a2ff15b7f5f1fba0fae3c643e82072eacc",
+    "source_sha256": "07fea776e3e7abdefd72695bf9abb73e0f625cf1ddd7680c5a86b31f80191652"
+  },
+  "training": {
+    "best_epoch": 99,
+    "epochs_run": 100,
+    "best_val_mse_scaled": 0.08358222246170044,
+    "training_seconds": 153.3864603000111,
+    "parameters": 385
+  },
+  "validation": {
+    "MSE": 98.85696938445884,
+    "RMSE": 9.94268421425818,
+    "R2": 0.8947065707555847
+  },
+  "torch_version": "2.11.0+cpu",
+  "data": {
+    "rows": 35040,
+    "window": 24,
+    "mean": 28.69404411315918,
+    "std": 34.39114761352539,
+    "features": [
+      "Usage_kWh",
+      "time_sin",
+      "time_cos",
+      "weekday_sin",
+      "weekday_cos"
+    ],
+    "splits": {
+      "train": {
+        "samples": 24480,
+        "first_target": "2018-01-01 12:00:00",
+        "last_target": "2018-09-13 11:45:00"
+      },
+      "val": {
+        "samples": 5256,
+        "first_target": "2018-09-13 12:00:00",
+        "last_target": "2018-11-07 05:45:00"
+      },
+      "test": {
+        "samples": 5256,
+        "first_target": "2018-11-07 06:00:00",
+        "last_target": "2018-12-31 23:45:00"
+      }
+    }
+  }
+}

@@ -39,3 +39,6 @@ Desktop.ini
 /lab3/results/**/*.pth
 /lab3/results/**/*.ckpt
 /lab3/results/**/*.log
+
+/lab4/data/
+/lab4/results/

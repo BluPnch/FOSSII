@@ -289,11 +289,11 @@ def write_report(table, studies, budgets, selections, scores, out):
               "для более строгой оценки нужны дополнительные временные разбиения. "
               "Тестовый период уже использовался в первоначальной лабораторной, поэтому "
               "это повторная оценка на прежнем отрезке, а не совершенно новый независимый тест.", "",
-              "## Воспроизведение", "", "```powershell", "python lab3/investigations/run.py --workers 3", "```", "",
-              "Готовые запуски с совпадающими настройками, хешами кода и данных переиспользуются. "
-              "`--force` повторяет обучение. Каждый запуск хранит веса, полный CSV истории, "
-              "валидационные прогнозы и лог в `runs/`. Сводная таблица — `validation_summary.csv`."]
-    (out / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+              "## Файлы результатов", "",
+              "В `runs/` сохраняются веса, история обучения, валидационные прогнозы и журналы. "
+              "Сводная таблица находится в `validation_summary.csv`. "
+              "[Команды запуска](../../../RUNNING.md#исследования)"]
+    (out / "REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main():
@@ -322,7 +322,7 @@ def main():
                   f"val RMSE={record['validation']['RMSE']:.4f}, "
                   f"epochs={record['training']['epochs_run']}, best={record['training']['best_epoch']}", flush=True)
     finalize(records, out)
-    print(f"Completed: {out / 'README.md'}", flush=True)
+    print(f"Completed: {out / 'REPORT.md'}", flush=True)
 
 
 if __name__ == "__main__":

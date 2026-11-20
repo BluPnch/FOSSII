@@ -24,7 +24,7 @@ def main():
                            "RMSE, после исследований": new["RMSE"],
                            "Снижение MSE, %": (old.loc[kind, "MSE"] - new["MSE"]) / old.loc[kind, "MSE"] * 100})
     winner = min(selected, key=lambda k: results["metrics"][k]["MSE"])
-    text = f"""# Лабораторная работа №3: прогнозирование энергопотребления
+    text = f"""# Результаты исследования гиперпараметров на NumPy
 
 ## Задание
 
@@ -34,28 +34,7 @@ def main():
 
 Подробные определения, примеры, формулы и вывод градиентов — в [additions.md](../../additions.md).
 
-## Запуск
-
-Из корня репозитория:
-
-```powershell
-python -m pip install -r lab3/requirements.txt
-# Обычное сравнение: до 100 эпох, минимум 60, patience 25
-python lab3/source/main.py --output lab3/results_manual
-# Все шесть исследований и выбор итоговых моделей
-python lab3/investigations/run.py --workers 3
-python lab3/investigations/update_readme.py
-```
-
-Датасет уже скачан в [data/Steel_industry_data.csv](../../data/Steel_industry_data.csv),
-при обучении интернет не используется. [Источник и лицензия](../../data/README.md).
-Исследования переиспользуют завершённые запуски при совпадении настроек и хешей кода
-и данных. `--force` повторяет обучение. `--workers` задаёт число процессов.
-Для отдельного короткого эксперимента нужно также уменьшить минимальное число эпох:
-
-```powershell
-python lab3/source/main.py --epochs 40 --min-epochs 40 --output lab3/results_40
-```
+[Команды запуска](../../RUNNING.md#исследования)
 
 ## Данные и прогноз
 
@@ -116,8 +95,8 @@ python lab3/source/main.py --epochs 40 --min-epochs 40 --output lab3/results_40
 learning rate 0.001, batch size 256, seed 42. Бюджеты эпох сравниваются по префиксам
 одной траектории; при ранней остановке фактическое число доступных эпох указано.
 
-**[Подробный отчёт: таблицы, кривые обучения и валидации, выводы](investigations/README.md).**
-[План и воспроизведение](../../investigations/README.md).
+[Таблицы, кривые обучения и валидации, выводы](investigations/REPORT.md).
+[План исследования](../../README.md#3-план-исследования).
 
 ## Выбранные конфигурации
 
@@ -171,7 +150,7 @@ RMSE **{results['metrics'][winner]['RMSE']:.4f} kWh**, R² **{results['metrics']
 - `results/baseline_30/` — сохранённый первоначальный запуск за 30 эпох.
 
 """
-    (OUTPUT / "README.md").write_text(text, encoding="utf-8")
+    (OUTPUT / "REPORT.md").write_text(text, encoding="utf-8")
 
 
 if __name__ == "__main__":

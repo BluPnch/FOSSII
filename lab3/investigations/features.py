@@ -183,13 +183,13 @@ def report(records):
               "Выводы не распространяются автоматически на другие архитектуры, горизонты и периоды. "
               "Тестовый период уже использовался ранее; для независимой оценки необходим новый период. "
               "Добавление признаков не заменяет проверку их доступности при практическом прогнозировании.", "",
-              "## Воспроизведение", "", "Из папки lab3:", "", "```powershell",
-              "python investigations/features.py --workers 3", "```", "",
+              "## Файлы результатов", "",
               "`validation_runs.csv` и `validation_summary.csv` — результаты всех повторов и сводка; "
               "`runs/` — веса, преобразования, истории и validation-прогнозы; "
               "`selected_model.npz` и `selected_config.json` — выбранная модель; "
-              "`test_comparison.csv` и `test_predictions.csv` — итоговый тест."]
-    (OUT / "README.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
+              "`test_comparison.csv` и `test_predictions.csv` — итоговый тест. "
+              "[Команды запуска](../../../RUNNING.md#исследования)"]
+    (OUT / "REPORT.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
     print(summary.to_string(index=False), flush=True)
     print(compare.to_string(index=False), flush=True)
 

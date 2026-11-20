@@ -144,7 +144,7 @@ def finish(records, new_records, combinations, out):
              "Переиспользованы 33 обучения с проверкой хешей кода, данных и настроек. "
              "Исследованы window = 8/24/48, hidden_size = 16/32/64, learning_rate = 0.0003/0.001/0.003, "
              "batch_size = 128/256/512, seed = 7/42/123, бюджеты = 30/60/100 эпох. "
-             "Подробные однофакторные таблицы и кривые: [первое исследование](../investigations/README.md).", "",
+             "План однофакторных экспериментов описан в [лабораторной работе](../../../README.md#3-план-исследования).", "",
              "Для каждой архитектуры лучшие значения четырёх параметров при seed 42 объединены. "
              "Каждое сочетание обучено на трёх seed; сравнение с базой выполнено по среднему validation MSE. "
              "Складывать отдельные выигрыши нельзя: результат сочетания измеряется отдельно. "
@@ -196,12 +196,12 @@ def finish(records, new_records, combinations, out):
              "Разбиение хронологическое 70/15/15, нормализация только по train. "
              "Тест не участвует в выборе конфигурации; прежний тестовый период уже использовался в лабораторной. "
              "Вывод ограничен этим временным разбиением и исследованной сеткой.", "",
-             "## Воспроизведение и артефакты", "", "```powershell", "# Из каталога lab3",
-             "python investigations/ideal.py --workers 3", "```", "",
+             "## Файлы результатов", "",
              "`ideal_model.npz` — обученные веса и preprocessing; `ideal_config.json` — конфигурация, "
              "критерий выбора и хеши; `ideal_history.csv` — обучение; `replications.csv`, `selection.csv`, "
-             "`comparison.csv`, `predictions.csv` — численные результаты. Новые обучения хранятся в `runs/`."]
-    (out / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+             "`comparison.csv`, `predictions.csv` — численные результаты. Новые обучения хранятся в `runs/`. "
+             "[Команды запуска](../../../RUNNING.md#исследования)"]
+    (out / "REPORT.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(table.to_string(index=False), flush=True)
     print(f"Selected {chosen['kind']} {winner.family}: {chosen['config']}", flush=True)
 

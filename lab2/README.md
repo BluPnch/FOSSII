@@ -1,4 +1,6 @@
-# Лабораторная работа №2: свёрточная нейронная сеть для классификации цифр
+# Лабораторная работа № 2. Распознавание цифр MNIST
+
+[Установка зависимостей и запуск](RUNNING.md)
 
 ## Задание
 
@@ -432,7 +434,7 @@ AUC всех цифр выше 0.9998, макро-AUC — **0.99992**. AUC вы�
 из архивных весов, все последующие значения получены фактическим обучением.
 
 [Код исследования](investigations/compare_60_epochs.py) ·
-[Подробные результаты и выводы](results/investigations/compare_60_epochs/README.md).
+[Подробные результаты и выводы](results/investigations/compare_60_epochs/REPORT.md).
 Веса и результаты предыдущего сравнения сохранены отдельно от этого исследования.
 
 ![Общий график loss до 60 эпох](results/investigations/compare_60_epochs/loss.png)
@@ -467,33 +469,7 @@ AUC всех цифр выше 0.9998, макро-AUC — **0.99992**. AUC вы�
 
 ---
 
-## 10. Запуск
-
-```
-pip install numpy matplotlib scikit-learn
-```
-
-Основная модель (из папки `lab2/source`):
-
-```
-python main.py            обучение до средней ошибки 0.0001, все графики и метрики
-python main.py --load     без обучения: загрузить results/weights.npz и пересчитать метрики и графики
-```
-
-Исследования (из папки `lab2/investigations`):
-
-```
-python conv_layers_count.py     число свёрточных слоёв
-python double_filters.py        число фильтров
-python kernel_size.py           размер ядра свёртки
-python pooling_window.py        размер окна пулинга
-python pooling_type.py          тип пулинга
-python compare_models.py        сравнение первой и оптимальной модели (без обучения)
-python compare_60_epochs.py     продолжить обе модели ровно до 60 эпох
-python compare_60_epochs.py --replot   перерисовать новое исследование без обучения
-```
-
-У исследований есть флаг `--replot`: перерисовать графики по сохранённым результатам без обучения.
+## 10. Файлы проекта
 
 | Папка | Что в ней |
 | --- | --- |
@@ -501,4 +477,4 @@ python compare_60_epochs.py --replot   перерисовать новое ис�
 | [investigations/](investigations/) | Код исследований |
 | [results/](results/) | Графики и веса итоговой модели |
 | [results/investigations/](results/investigations/) | Графики и результаты исследований и сравнения моделей |
-| [results/archive_baseline/](results/archive_baseline/) | Первая модель: веса, графики, журнал обучения |
+| [results/archive_baseline/](results/archive_baseline/) | Веса и графики первой модели |

@@ -1,4 +1,41 @@
-.venv
-not-push
-lab2/data
-__pycache__
+# Окружения, кэши Python и Jupyter
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# IDE и файлы операционной системы
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Локальные файлы и копии датасетов
+/not-push
+/lab1/mushroom/
+/lab2/data/
+/lab2/6009974_1000.jpg
+/lab3/data/steel_industry_energy_consumption.zip
+
+# Артефакты обучения
+/lab2/results/archive_4_epochs/
+/lab2/results/local/
+/lab2/results/**/training_log.txt
+/lab2/results/**/*.log
+/lab2/results/**/*.npz
+!/lab2/results/weights.npz
+!/lab2/results/archive_baseline/weights.npz
+
+/lab3/results/numpy/
+/lab3/results/**/runs/
+/lab3/results/**/*.pt
+/lab3/results/**/*.pth
+/lab3/results/**/*.ckpt
+/lab3/results/**/*.log

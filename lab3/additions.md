@@ -5,9 +5,8 @@
 результаты взяты из сохранённых CSV и JSON. В примерах с маленькими числами
 используются условные данные: они нужны для понимания вычислений.
 
-Рекуррентные ячейки написаны явно. PyTorch предоставляет линейные преобразования,
-автоматическое дифференцирование и Adam. **Ручной реализации обратного прохода
-в проекте нет**; ниже градиенты выведены, чтобы объяснить, что вычисляет autograd.
+Текущий код реализует рекуррентные ячейки, BPTT и Adam на NumPy. Численные результаты
+и отдельные примеры с autograd относятся к предыдущей версии на PyTorch.
 
 ## Содержание
 
@@ -87,13 +86,13 @@ learning rate, размер батча, предел эпох. **Seed** зада
 | Файл или каталог | Назначение |
 | --- | --- |
 | [data/Steel_industry_data.csv](data/Steel_industry_data.csv) | Локальный исходный датасет |
-| [data/README.md](data/README.md) | Источник, авторы, лицензия и архив |
+| [Источник и лицензия](README.md#1-задача-и-данные) | Сведения о наборе данных |
 | [source/data_preparation.py](source/data_preparation.py) | Даты, признаки, стандартизация, окна |
 | [source/models.py](source/models.py) | Прямой проход RNN, GRU, LSTM |
 | [source/main.py](source/main.py) | Обучение, метрики, сохранение весов и графиков |
 | [investigations/run.py](investigations/run.py) | Все исследования, выбор моделей по валидации |
-| [investigations/update_readme.py](investigations/update_readme.py) | Формирование основного отчёта |
-| [results/investigations/README.md](results/investigations/README.md) | Подробные результаты исследований |
+| [investigations/update_readme.py](investigations/update_readme.py) | Формирование сводного отчёта расчётов NumPy |
+| [results/investigations/REPORT.md](results/investigations/REPORT.md) | Подробные результаты исследований |
 | [results/metrics.csv](results/metrics.csv) | Итоговые тестовые метрики |
 | [results/results.json](results/results.json) | Выбранные конфигурации и сведения о запусках |
 | [results/predictions.csv](results/predictions.csv) | Даты, фактические значения и прогнозы |
@@ -148,7 +147,7 @@ $$
 Таким образом, это прогноз по истории потребления и календарю. Не предполагается,
 что будущие показатели производства, выбросов или тип нагрузки заранее известны.
 Результаты базового исследования получены без них. Дополнительно проведено
-[отдельное исследование прошлых значений других столбцов](results/features/README.md):
+[отдельное исследование прошлых значений других столбцов](results/features/REPORT.md):
 реактивной энергии, коэффициентов мощности, CO₂, типа нагрузки и календарных полей.
 В нём входные значения строго предшествуют целевому моменту; сравниваются группы
 признаков при одинаковых настройках GRU и трёх seed. Таблица выше описывает базовую
@@ -1788,111 +1787,9 @@ train пунктиром и validation сплошными линиями для 
 <a id="reproduce"></a>
 ## 18. Воспроизведение и проверка результатов
 
-### 18.1. Обычное обучение
+[Установка зависимостей, команды обучения и проверки](RUNNING.md).
 
-Из корня репозитория:
-
-```powershell
-python -m pip install -r lab3/requirements.txt
-python lab3/source/main.py --output lab3/results_manual
-```
-
-По умолчанию: окно 24, скрытый размер 32, батч 256, скорость 0.001, seed 42,
-до 100 эпох, минимум 60, patience 25. Это общий запуск трёх моделей с одинаковыми
-настройками, а не автоматическое восстановление трёх разных выбранных конфигураций.
-Отдельный каталог результата сохраняет итоговые файлы исследований от перезаписи.
-
-Для изменения настроек:
-
-```powershell
-python lab3/source/main.py --window 48 --hidden-size 64 --epochs 100 --output lab3/results_custom
-```
-
-При уменьшении максимума эпох нужно согласовать нижний предел:
-
-```powershell
-python lab3/source/main.py --epochs 40 --min-epochs 40 --output lab3/results_40
-```
-
-### 18.2. Полный набор исследований
-
-```powershell
-python lab3/investigations/run.py --workers 3
-```
-
-Каждый процесс использует один поток PyTorch; `--workers` задаёт число параллельно
-обучаемых моделей. Завершённые запуски с совпадающими настройками и хешами
-датасета и основных исходных файлов переиспользуются. Поэтому повторный запуск
-с уже готовыми результатами в основном пересобирает отчёты и графики.
-
-```powershell
-# Повторить все обучения независимо от готовых записей
-python lab3/investigations/run.py --workers 3 --force
-# Пересобрать только основной README из готовых итоговых файлов
-python lab3/investigations/update_readme.py
-```
-
-Seed фиксируется для Python, NumPy и PyTorch. Включены детерминированные алгоритмы.
-Хеши позволяют проверить, что данные и основные исходники совпадают с записью
-запуска. Воспроизводимость всё равно следует оценивать с учётом версий библиотек
-и вычислительного окружения: одинаковый seed не является обещанием побитового
-совпадения на произвольном оборудовании и любой версии PyTorch.
-
-### 18.3. Пример загрузки итоговой модели
-
-Следующий пример выполняется из корня репозитория и показывает первый тестовый
-прогноз сохранённой LSTM:
-
-```python
-import sys
-from pathlib import Path
-
-import torch
-
-sys.path.insert(0, str(Path("lab3/source").resolve()))
-from data_preparation import prepare_data
-from models import RecurrentRegressor
-
-checkpoint = torch.load("lab3/results/lstm.pt", weights_only=True)
-info = checkpoint["preprocessing"]
-model = RecurrentRegressor(
-    checkpoint["kind"],
-    input_size=checkpoint["input_size"],
-    hidden_size=checkpoint["hidden_size"],
-)
-model.load_state_dict(checkpoint["state_dict"])
-model.eval()
-
-datasets, frame, _ = prepare_data(
-    "lab3/data/Steel_industry_data.csv", info["window"]
-)
-x, _ = datasets["test"][0]
-with torch.no_grad():
-    prediction_scaled = model(x.unsqueeze(0)).item()
-prediction_kwh = prediction_scaled * info["std"] + info["mean"]
-print(prediction_kwh)
-```
-
-`unsqueeze(0)` добавляет размер батча: окно `(L, 5)` становится `(1, L, 5)`.
-В этом примере используется тот же исходный CSV, поэтому заново вычисленные
-признаки совпадают с обучающими настройками. Для нового ряда нужно применять
-**сохранённые** `mean` и `std` к его прошлым измерениям, а не заново подгонять
-нормализацию по всему новому ряду. Иначе это будет другая процедура предсказания.
-
-### 18.4. Что сохраняется и что было проверено
-
-Для каждого исследования в `results/investigations/runs/` находятся:
-
-- `result.json`: конфигурация, метрики валидации, лучшие эпохи и хеши;
-- `*_history.csv`: train MSE и validation MSE каждой выполненной эпохи;
-- `*.pt`: лучшие веса и параметры предобработки;
-- `validation_predictions.csv`: валидационные факты и прогнозы;
-- `training.log`: сообщения о ходе обучения.
-
-В итоговом `results/` сохранены выбранные модели, их истории, тестовые прогнозы,
-метрики и графики. Первоначальные результаты 30 эпох находятся в `baseline_30/`.
-
-Фактически выполнены следующие проверки:
+Для сохранённых результатов предыдущей реализации на PyTorch выполнены следующие проверки.
 
 1. Выходы и градиенты по входу явных RNN, GRU и LSTM сопоставлены с эквивалентными
    модулями PyTorch при одинаковых весах.
@@ -2002,4 +1899,4 @@ Adam масштабирует обновления по истории град�
 
 Основной отчёт: [README.md](README.md).
 Полные таблицы, графики и выводы исследований:
-[results/investigations/README.md](results/investigations/README.md).
+[results/investigations/REPORT.md](results/investigations/REPORT.md).

@@ -17,6 +17,7 @@ from threadpoolctl import threadpool_limits
 
 from common import (SequentialCNN, load_data, evaluate, confusion_matrix,
                     classification_metrics, roc_one_vs_rest, save)
+from data_preparation import FILES, download
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "results/investigations/compare_60_epochs"
@@ -263,19 +264,10 @@ def write_report(records, output, epochs):
               "точность на новых изображениях: тест посчитан отдельно после завершения "
               "всех эпох и не управляет остановкой. Время дообучения измерялось при "
               "параллельных запусках и не сопоставляется напрямую со старыми временами.", "",
-              "## Воспроизведение", "", "```powershell",
-              "python lab2/investigations/compare_60_epochs.py",
-              "python lab2/investigations/compare_60_epochs.py --replot", "```", "",
-              "Checkpoint и CSV сохраняются после каждой эпохи. Повторный запуск "
-              "продолжает незавершённый расчёт. Чтобы обучить обе сети заново с первой эпохи:", "",
-              "```powershell",
-              "python lab2/investigations/compare_60_epochs.py --from-scratch --output lab2/results/investigations/compare_60_epochs_fresh",
-              "```", "",
-              "Для каждой модели: `history.csv`, `weights.npz`, `training.log`, "
-              "`timings.json`, `result.json`, `test_predictions.npz`. "
-              "Общая сводка — `results.json`. Новое исследование не перезаписывает "
-              "исходные `results/weights.npz` и `results/archive_baseline/weights.npz`."]
-    (output / "README.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
+              "## Файлы результатов", "",
+              "Общая сводка сохранена в `results.json`. Для каждой модели есть история потерь "
+              "и времени по эпохам, а также отдельный `result.json`."]
+    (output / "REPORT.md").write_text("\n".join(lines)+"\n", encoding="utf-8")
 
 
 def main():
@@ -294,6 +286,8 @@ def main():
         records = json.loads((args.output / "results.json").read_text(encoding="utf-8"))["results"]
         epochs = records[0]["epochs"]
     else:
+        for filename in FILES.values():
+            download(filename)
         with ProcessPoolExecutor(max_workers=min(args.workers, 2)) as pool:
             futures = {pool.submit(train_model, key, args.output, args.epochs, args.threads, args.from_scratch): key
                        for key in SPECS}
@@ -310,7 +304,7 @@ def main():
         epochs = args.epochs
     draw_curves(records, args.output, epochs)
     write_report(records, args.output, epochs)
-    print(f"Saved: {args.output / 'README.md'}", flush=True)
+    print(f"Saved: {args.output / 'REPORT.md'}", flush=True)
 
 
 if __name__ == "__main__":

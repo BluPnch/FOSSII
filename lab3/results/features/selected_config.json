@@ -1,0 +1,48 @@
+{
+  "winner": "baseline",
+  "seed": 42,
+  "criterion": "Minimum mean validation MSE over seeds 7,42,123",
+  "config": {
+    "window": 24,
+    "hidden_size": 32,
+    "learning_rate": 0.001,
+    "batch_size": 256,
+    "seed": 42
+  },
+  "test": {
+    "MSE": 61.35933995633784,
+    "RMSE": 7.833220280085186,
+    "R2": 0.9368435916287712
+  },
+  "preprocessing": {
+    "rows": 35040,
+    "window": 24,
+    "mean": 28.69404411315918,
+    "std": 34.39114761352539,
+    "features": [
+      "Usage_kWh",
+      "time_sin",
+      "time_cos",
+      "weekday_sin",
+      "weekday_cos"
+    ],
+    "splits": {
+      "train": {
+        "samples": 24480,
+        "first_target": "2018-01-01 12:00:00",
+        "last_target": "2018-09-13 11:45:00"
+      },
+      "val": {
+        "samples": 5256,
+        "first_target": "2018-09-13 12:00:00",
+        "last_target": "2018-11-07 05:45:00"
+      },
+      "test": {
+        "samples": 5256,
+        "first_target": "2018-11-07 06:00:00",
+        "last_target": "2018-12-31 23:45:00"
+      }
+    }
+  },
+  "sha256": "bc2562c53abfe14c7f2869646772a8cff38f295a9462df4b3e00a52270df7e3e"
+}

@@ -1,16 +1,13 @@
 """Build the laboratory overview from completed investigation artifacts."""
 
 import json
-from pathlib import Path
 import pandas as pd
 
-from run import markdown_table
-
-ROOT = Path(__file__).resolve().parents[1]
+from run import OUTPUT, ROOT, markdown_table
 
 
 def main():
-    results = json.loads((ROOT / "results/results.json").read_text(encoding="utf-8"))
+    results = json.loads((OUTPUT / "results.json").read_text(encoding="utf-8"))
     selected = results["selected"]
     scores = pd.DataFrame(results["metrics"]).T.rename_axis("Модель").reset_index()
     configs = pd.DataFrame([
@@ -35,7 +32,7 @@ def main():
 [Steel Industry Energy Consumption](https://archive.ics.uci.edu/dataset/851/steel+industry+energy+consumption).
 Сравнить модели по MSE, RMSE и R², исследовать гиперпараметры и сделать выводы.
 
-Подробные определения, примеры, формулы и вывод градиентов — в [additions.md](additions.md).
+Подробные определения, примеры, формулы и вывод градиентов — в [additions.md](../../additions.md).
 
 ## Запуск
 
@@ -50,8 +47,8 @@ python lab3/investigations/run.py --workers 3
 python lab3/investigations/update_readme.py
 ```
 
-Датасет уже скачан в [data/Steel_industry_data.csv](data/Steel_industry_data.csv),
-при обучении интернет не используется. [Источник и лицензия](data/README.md).
+Датасет уже скачан в [data/Steel_industry_data.csv](../../data/Steel_industry_data.csv),
+при обучении интернет не используется. [Источник и лицензия](../../data/README.md).
 Исследования переиспользуют завершённые запуски при совпадении настроек и хешей кода
 и данных. `--force` повторяет обучение. `--workers` задаёт число процессов.
 Для отдельного короткого эксперимента нужно также уменьшить минимальное число эпох:
@@ -87,12 +84,12 @@ python lab3/source/main.py --epochs 40 --min-epochs 40 --output lab3/results_40
 
 ## Реализация и обучение
 
-[source/models.py](source/models.py) содержит явные формулы ячеек без готовых
-`nn.RNN`, `nn.GRU` и `nn.LSTM`. Линейные слои, autograd и Adam предоставляет PyTorch.
+[source/models.py](../../source/models.py) содержит реализацию ячеек, ручной BPTT
+и Adam на NumPy.
 
 - RNN: `h_t = tanh(W_x x_t + b_x + W_h h_(t−1) + b_h)`.
 - GRU: reset и update gate; `n_t = tanh(x_n + r_t ⊙ h_n)`,
-  `h_t = z_t ⊙ h_(t−1) + (1 − z_t) ⊙ n_t` (вариант PyTorch).
+  `h_t = z_t ⊙ h_(t−1) + (1 − z_t) ⊙ n_t`.
 - LSTM: `c_t = f_t ⊙ c_(t−1) + i_t ⊙ g_t`, `h_t = o_t ⊙ tanh(c_t)`.
 
 Один рекуррентный слой, нулевое начальное состояние каждого окна, линейный выход
@@ -119,8 +116,8 @@ python lab3/source/main.py --epochs 40 --min-epochs 40 --output lab3/results_40
 learning rate 0.001, batch size 256, seed 42. Бюджеты эпох сравниваются по префиксам
 одной траектории; при ранней остановке фактическое число доступных эпох указано.
 
-**[Подробный отчёт: таблицы, кривые обучения и валидации, выводы](results/investigations/README.md).**
-[План и воспроизведение](investigations/README.md).
+**[Подробный отчёт: таблицы, кривые обучения и валидации, выводы](investigations/README.md).**
+[План и воспроизведение](../../investigations/README.md).
 
 ## Выбранные конфигурации
 
@@ -130,7 +127,7 @@ learning rate 0.001, batch size 256, seed 42. Бюджеты эпох сравн
 
 {markdown_table(configs)}
 
-![Обучение и валидация выбранных моделей](results/loss.png)
+![Обучение и валидация выбранных моделей](loss.png)
 
 ## Итоговый тест
 
@@ -142,7 +139,7 @@ Persistence — прогноз `ŷ[t] = y[t−1]`.
 
 {markdown_table(scores)}
 
-![Прогнозы первых четырёх тестовых дней](results/predictions.png)
+![Прогнозы первых четырёх тестовых дней](predictions.png)
 
 Сравнение с первоначальным запуском за 30 эпох:
 
@@ -170,13 +167,11 @@ RMSE **{results['metrics'][winner]['RMSE']:.4f} kWh**, R² **{results['metrics']
 - `results/investigations/runs/` — веса, история всех эпох, логи, валидационные прогнозы.
 - `results/metrics.csv`, `results/predictions.csv`, `results/results.json` — итоговый тест,
   выбранные настройки, лучшие эпохи, хеши данных и кода.
-- `results/rnn.pt`, `gru.pt`, `lstm.pt` и `*_history.csv` — выбранные модели и истории.
+- `rnn.npz`, `gru.npz`, `lstm.npz` и `*_history.csv` — выбранные модели и истории.
 - `results/baseline_30/` — сохранённый первоначальный запуск за 30 эпох.
 
-Проверены совпадение выходов и градиентов ячеек с эквивалентными модулями PyTorch,
-смещение окон и совпадение дат целей во всех 11 конфигурациях.
 """
-    (ROOT / "README.md").write_text(text, encoding="utf-8")
+    (OUTPUT / "README.md").write_text(text, encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -2,14 +2,12 @@
 
 import numpy as np
 import pandas as pd
-import torch
-from torch.utils.data import Dataset
 
 
-class Windows(Dataset):
+class Windows:
     def __init__(self, features, targets, start, stop, window):
-        self.features = torch.from_numpy(features)
-        self.targets = torch.from_numpy(targets)
+        self.features = features
+        self.targets = targets
         self.start = start
         self.stop = stop
         self.window = window
@@ -20,6 +18,16 @@ class Windows(Dataset):
     def __getitem__(self, index):
         t = self.start + index
         return self.features[t - self.window:t], self.targets[t]
+
+    def batches(self, batch_size, rng=None):
+        # Индексы целей. На обучении перемешиваем их, сохраняя порядок в окнах.
+        targets = np.arange(self.start, self.stop)
+        if rng is not None:
+            rng.shuffle(targets)
+        offsets = np.arange(-self.window, 0)
+        for start in range(0, len(targets), batch_size):
+            indices = targets[start:start + batch_size]
+            yield self.features[indices[:, None] + offsets], self.targets[indices]
 
 
 def prepare_data(path, window):

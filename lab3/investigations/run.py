@@ -6,25 +6,29 @@ from contextlib import redirect_stdout
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import shutil
 import sys
 from types import SimpleNamespace
+
+# Каждый процесс исследования использует один поток BLAS.
+for variable in ("OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "OMP_NUM_THREADS"):
+    os.environ[variable] = "1"
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import torch
-from torch.utils.data import DataLoader
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "source"))
 from data_preparation import prepare_data
-from main import train, predict, metrics
+from main import OUTPUT, train, predict, metrics
 from models import RecurrentRegressor
 
+STUDY_OUT = OUTPUT / "investigations"
 BASE = dict(window=24, hidden_size=32, learning_rate=0.001, batch_size=256, seed=42)
 FACTORS = {
     "window": [8, 24, 48],
@@ -70,21 +74,17 @@ def run_one(name, kind, config, epochs, out):
         record = json.loads(record_path.read_text())
         if record["signature"] == signature:
             return record
-    torch.set_num_threads(1)
-    torch.use_deterministic_algorithms(True)
     datasets, frame, info = prepared(config)
-    loaders = {key: DataLoader(ds, batch_size=config["batch_size"], shuffle=key == "train")
-               for key, ds in datasets.items() if key != "test"}
     with (folder / "training.log").open("w", encoding="utf-8") as log, redirect_stdout(log):
-        model, history, training = train(kind, loaders, SimpleNamespace(**settings), folder, info)
+        model, history, training = train(kind, datasets, SimpleNamespace(**settings), folder, info)
     ds = datasets["val"]
     actual = frame.Usage_kWh.to_numpy()[ds.start:ds.stop]
-    values = predict(model, loaders["val"]) * info["std"] + info["mean"]
+    values = predict(model, ds, config["batch_size"]) * info["std"] + info["mean"]
     pd.DataFrame({"date": frame.date.iloc[ds.start:ds.stop].to_numpy(),
                   "actual": actual, "predicted": values}).to_csv(folder / "validation_predictions.csv", index=False)
     record = {"name": name, "kind": kind, "config": config, "signature": signature,
               "training": training, "validation": metrics(actual, values),
-              "torch_version": torch.__version__, "data": info}
+              "numpy_version": np.__version__, "data": info}
     record_path.write_text(json.dumps(record, indent=2), encoding="utf-8")
     return record
 
@@ -170,7 +170,7 @@ def finalize(records, out):
     table, studies, budgets = plots_and_tables(records, out)
     selected = [min((r for r in records if r["kind"] == k),
                     key=lambda r: r["validation"]["MSE"]) for k in ("RNN", "GRU", "LSTM")]
-    final = ROOT / "results"
+    final = OUTPUT
     final.mkdir(exist_ok=True)
     predictions, scores, selections = None, {}, {}
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
@@ -178,20 +178,18 @@ def finalize(records, out):
         kind, config = record["kind"], record["config"]
         datasets, frame, info = prepared(config)
         folder = out / "runs" / record["name"] / kind.lower()
-        checkpoint = torch.load(folder / f"{kind.lower()}.pt", weights_only=True)
-        model = RecurrentRegressor(kind, hidden_size=config["hidden_size"])
-        model.load_state_dict(checkpoint["state_dict"])
+        model, _ = RecurrentRegressor.load(folder / f"{kind.lower()}.npz")
         ds = datasets["test"]
         if predictions is None:
             predictions = pd.DataFrame({"date": frame.date.iloc[ds.start:].to_numpy(),
                                         "actual": frame.Usage_kWh.iloc[ds.start:].to_numpy(),
                                         "Persistence": frame.Usage_kWh.iloc[ds.start-1:-1].to_numpy()})
             scores["Persistence"] = metrics(predictions.actual, predictions.Persistence)
-        values = predict(model, DataLoader(ds, batch_size=config["batch_size"])) * info["std"] + info["mean"]
+        values = predict(model, ds, config["batch_size"]) * info["std"] + info["mean"]
         predictions[kind] = values
         scores[kind] = metrics(predictions.actual, values)
         selections[kind] = record
-        for suffix in (".pt", "_history.csv"):
+        for suffix in (".npz", "_history.csv"):
             shutil.copy2(folder / f"{kind.lower()}{suffix}", final / f"{kind.lower()}{suffix}")
         h = pd.read_csv(folder / f"{kind.lower()}_history.csv")
         ax.plot(h.epoch, h.train_mse_scaled, label="Train")
@@ -305,14 +303,8 @@ def main():
     args = parser.parse_args()
     if args.workers < 1:
         parser.error("workers must be positive")
-    out = ROOT / "results/investigations"
+    out = STUDY_OUT
     out.mkdir(parents=True, exist_ok=True)
-    archive = ROOT / "results/baseline_30"
-    if not archive.exists():
-        archive.mkdir()
-        for path in (ROOT / "results").iterdir():
-            if path.is_file():
-                shutil.copy2(path, archive / path.name)
     jobs = [(name, kind, config) for name, config in configurations().items()
             for kind in ("RNN", "GRU", "LSTM")]
     if args.force:
@@ -329,7 +321,6 @@ def main():
             print(f"[{len(records)}/{len(jobs)}] {record['name']} {record['kind']}: "
                   f"val RMSE={record['validation']['RMSE']:.4f}, "
                   f"epochs={record['training']['epochs_run']}, best={record['training']['best_epoch']}", flush=True)
-    torch.set_num_threads(1)
     finalize(records, out)
     print(f"Completed: {out / 'README.md'}", flush=True)
 

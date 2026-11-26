@@ -1,0 +1,228 @@
+<div id="second-convolution">
+  <style>
+    #second-convolution {
+      --plate-edge: color-mix(in srgb, var(--foreground) 45%, var(--background));
+      --plate-grid: color-mix(in srgb, var(--foreground) 22%, var(--background));
+      --data-color: var(--viz-series-1, var(--blue));
+      --weight-color: var(--viz-series-2, var(--purple));
+      display: grid;
+      gap: calc(var(--font-size-base) * 1.25);
+      color: var(--foreground);
+    }
+    #second-convolution .calculation {
+      display: grid;
+      grid-template-columns: minmax(0, 2.55fr) minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+    }
+    #second-convolution .operands {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+    }
+    #second-convolution figure {
+      display: grid;
+      justify-items: center;
+      min-width: 0;
+      margin: 0;
+      text-align: center;
+    }
+    #second-convolution .drawing {
+      display: block;
+      width: 100%;
+      max-width: 208px;
+    }
+    #second-convolution .caption {
+      display: grid;
+      gap: calc(var(--font-size-base) * .25);
+    }
+    #second-convolution .label { font-weight: 500; }
+    #second-convolution .face { fill: var(--background); stroke: var(--plate-edge); }
+    #second-convolution .grid-lines { fill: none; stroke: var(--plate-grid); }
+    #second-convolution .weight-face { fill: color-mix(in srgb, var(--weight-color) 17%, var(--background)); stroke: var(--plate-edge); }
+    #second-convolution .data-fill { fill: color-mix(in srgb, var(--data-color) 22%, var(--background)); }
+    #second-convolution .data-edge { fill: none; stroke: var(--data-color); }
+    #second-convolution .face,
+    #second-convolution .grid-lines,
+    #second-convolution .weight-face,
+    #second-convolution .data-edge {
+      vector-effect: non-scaling-stroke;
+      stroke-width: .85;
+    }
+    #second-convolution .window-outline { stroke-width: 1.4; }
+    #second-convolution .reduce {
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: calc(var(--font-size-base) * .25);
+      padding-inline: 4px;
+      text-align: center;
+    }
+    #second-convolution .arrow {
+      display: block;
+      width: 100%;
+      max-width: 114px;
+      height: 16px;
+      color: var(--muted-foreground);
+    }
+    #second-convolution .arrow-down { display: none; }
+    #second-convolution .result .drawing { max-width: 160px; }
+    #second-convolution .all-channels {
+      display: grid;
+      gap: calc(var(--font-size-base) * .5);
+    }
+    #second-convolution .channel-cells {
+      display: grid;
+      grid-template-columns: repeat(32, minmax(0, 1fr));
+      gap: 2px;
+    }
+    #second-convolution .channel-cells span {
+      height: 14px;
+      background: color-mix(in srgb, var(--data-color) 30%, var(--background));
+    }
+    #second-convolution .channel-cells span:first-child {
+      background: var(--data-color);
+    }
+    #second-convolution .channel-labels {
+      display: flex;
+      justify-content: space-between;
+    }
+    @media (max-width: 600px) {
+      #second-convolution .calculation {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        gap: calc(var(--font-size-base) * .75);
+      }
+      #second-convolution .operands { width: min(100%, 430px); }
+      #second-convolution .reduce { grid-template-columns: auto 16px; gap: 8px; align-items: center; }
+      #second-convolution .arrow { width: 16px; height: 34px; }
+      #second-convolution .arrow-across { display: none; }
+      #second-convolution .arrow-down { display: inline; }
+      #second-convolution .result .drawing { width: 134px; }
+    }
+  </style>
+
+  <div class="calculation">
+    <div class="operands">
+      <figure>
+        <svg class="drawing" viewBox="0 0 212 162" role="img" aria-label="Стопка из 16 входных карт. Окно 4 на 4 выделено в одной и той же позиции на каждой карте.">
+          <defs>
+            <g id="conv-input-map">
+              <rect class="face" width="104" height="104"/>
+              <rect class="data-fill" x="26" y="26" width="52" height="52"/>
+              <path class="grid-lines" d="M13 0v104 M26 0v104 M39 0v104 M52 0v104 M65 0v104 M78 0v104 M91 0v104 M0 13h104 M0 26h104 M0 39h104 M0 52h104 M0 65h104 M0 78h104 M0 91h104"/>
+              <rect class="data-edge window-outline" x="26" y="26" width="52" height="52"/>
+            </g>
+          </defs>
+          <g transform="matrix(1 .17 -.29 .8 47 53)">
+            <use href="#conv-input-map" x="30" y="-60"/>
+            <use href="#conv-input-map" x="28" y="-56"/>
+            <use href="#conv-input-map" x="26" y="-52"/>
+            <use href="#conv-input-map" x="24" y="-48"/>
+            <use href="#conv-input-map" x="22" y="-44"/>
+            <use href="#conv-input-map" x="20" y="-40"/>
+            <use href="#conv-input-map" x="18" y="-36"/>
+            <use href="#conv-input-map" x="16" y="-32"/>
+            <use href="#conv-input-map" x="14" y="-28"/>
+            <use href="#conv-input-map" x="12" y="-24"/>
+            <use href="#conv-input-map" x="10" y="-20"/>
+            <use href="#conv-input-map" x="8" y="-16"/>
+            <use href="#conv-input-map" x="6" y="-12"/>
+            <use href="#conv-input-map" x="4" y="-8"/>
+            <use href="#conv-input-map" x="2" y="-4"/>
+            <use href="#conv-input-map"/>
+            <path class="data-edge" d="M26 26l30 -60 M78 26l30 -60" stroke-dasharray="2.5 3"/>
+          </g>
+        </svg>
+        <figcaption class="caption">
+          <span class="label">16 входных карт</span>
+          <span class="text-small text-muted">Окна 4×4 в одной позиции</span>
+        </figcaption>
+      </figure>
+
+      <span role="img" aria-label="Поэлементно умножить на">×</span>
+
+      <figure>
+        <svg class="drawing" viewBox="0 0 212 162" role="img" aria-label="Фильтр номер 1. Для каждого из 16 входных каналов есть своя сетка весов 4 на 4.">
+          <defs>
+            <g id="conv-weight-map">
+              <rect class="weight-face" width="68" height="68"/>
+              <path class="grid-lines" d="M17 0v68 M34 0v68 M51 0v68 M0 17h68 M0 34h68 M0 51h68"/>
+            </g>
+          </defs>
+          <g transform="matrix(1 .17 -.29 .8 53 74)">
+            <use href="#conv-weight-map" x="45" y="-60"/>
+            <use href="#conv-weight-map" x="42" y="-56"/>
+            <use href="#conv-weight-map" x="39" y="-52"/>
+            <use href="#conv-weight-map" x="36" y="-48"/>
+            <use href="#conv-weight-map" x="33" y="-44"/>
+            <use href="#conv-weight-map" x="30" y="-40"/>
+            <use href="#conv-weight-map" x="27" y="-36"/>
+            <use href="#conv-weight-map" x="24" y="-32"/>
+            <use href="#conv-weight-map" x="21" y="-28"/>
+            <use href="#conv-weight-map" x="18" y="-24"/>
+            <use href="#conv-weight-map" x="15" y="-20"/>
+            <use href="#conv-weight-map" x="12" y="-16"/>
+            <use href="#conv-weight-map" x="9" y="-12"/>
+            <use href="#conv-weight-map" x="6" y="-8"/>
+            <use href="#conv-weight-map" x="3" y="-4"/>
+            <use href="#conv-weight-map"/>
+          </g>
+        </svg>
+        <figcaption class="caption">
+          <span class="label">Фильтр №1</span>
+          <span class="text-small text-muted">4×4×16 весов</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="reduce">
+      <div class="caption">
+        <span class="label">Сумма 256 произведений</span>
+        <span class="text-small text-muted">+ смещение b₁ один раз</span>
+      </div>
+      <svg class="arrow" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+        <defs>
+          <marker id="conv-arrow-head" orient="auto" markerUnits="userSpaceOnUse" refX="8" refY="5" markerWidth="10" markerHeight="10">
+            <path d="M1 1L8 5 1 9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <line class="arrow-across" x1="1" y1="50%" x2="97%" y2="50%" marker-end="url(#conv-arrow-head)"/>
+        <line class="arrow-down" x1="50%" y1="2" x2="50%" y2="95%" marker-end="url(#conv-arrow-head)"/>
+      </svg>
+    </div>
+
+    <figure class="result">
+      <svg class="drawing" viewBox="0 0 160 125" role="img" aria-label="Одна выделенная клетка в первой выходной карте.">
+        <g transform="matrix(1 .17 -.29 .8 43 15)">
+          <rect class="face" width="96" height="96"/>
+          <path class="grid-lines" d="M16 0v96 M32 0v96 M48 0v96 M64 0v96 M80 0v96 M0 16h96 M0 32h96 M0 48h96 M0 64h96 M0 80h96"/>
+          <rect x="32" y="32" width="16" height="16" fill="var(--data-color)"/>
+        </g>
+      </svg>
+      <figcaption class="caption">
+        <span class="label">Выходной канал №1</span>
+        <span class="text-small text-muted">Одно число в клетке (i, j)</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="all-channels">
+    <div class="caption">
+      <span class="label">Все 32 фильтра на том же окне</span>
+      <span class="text-small text-muted">32 значения в позиции (i, j), по одному на канал</span>
+    </div>
+    <div class="channel-cells" role="img" aria-label="32 значения, расположенные по номерам выходных каналов. Первое значение выделено.">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="channel-labels text-small text-muted" aria-hidden="true">
+      <span>Канал 1</span><span>Канал 32</span>
+    </div>
+  </div>
+</div>

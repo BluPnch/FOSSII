@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1016 416" role="img" aria-labelledby="title desc">
+  <title id="title">Послойная архитектура GAN+VAE</title>
+  <desc id="desc">Зашумлённое изображение проходит энкодер и превращается в латентный код из 32 чисел. Декодер-генератор обрабатывает этот код или независимый случайный код. Во время обучения дискриминатор получает выход генератора и чистый оригинал. Под каждым блоком указана форма выхода без оси батча.</desc>
+
+  <rect width="1016" height="416" rx="12" fill="#fff"/>
+  <g font-family="Segoe UI, Arial, sans-serif" stroke-width="5">
+    <g fill="#262624" font-size="23" font-weight="600">
+      <text text-anchor="middle" x="193" y="38">Энкодер</text>
+      <text text-anchor="middle" x="543" y="38">Декодер-генератор</text>
+      <text text-anchor="middle" x="859" y="38">Дискриминатор</text>
+    </g>
+    <g fill="#50504d" font-size="17">
+      <text text-anchor="middle" x="435" y="77">Случайный код из N(0, I)</text>
+      <text text-anchor="middle" x="751" y="77">Чистый оригинал</text>
+    </g>
+    <g fill="none" stroke="#767670" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M435 85V104m-5-5 5 5 5-5 M751 85V104m-5-5 5 5 5-5"/>
+      <path d="M369 212H402m-5-5 5 5-5 5 M683 212H718m-5-5 5 5-5 5"/>
+    </g>
+
+    <g transform="translate(22 110)" fill="#474746">
+      <rect width="54" height="204" rx="7" fill="#e7e7e7" stroke="#4a4a4a"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Вход MNIST</text>
+        <text text-anchor="middle" y="16" font-size="16">С шумом</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">28×28×1</text>
+    </g>
+    <g transform="translate(94 110)" fill="#924500">
+      <rect width="54" height="204" rx="7" fill="#fce5cf" stroke="#ef942c"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Conv 4×4 · 1 → 16</text>
+        <text text-anchor="middle" y="16" font-size="16">ReLU</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">14×14×16</text>
+    </g>
+    <g transform="translate(166 110)" fill="#924500">
+      <rect width="54" height="204" rx="7" fill="#fce5cf" stroke="#ef942c"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Conv 4×4 · 16 → 32</text>
+        <text text-anchor="middle" y="16" font-size="16">ReLU</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">7×7×32</text>
+    </g>
+    <g transform="translate(238 110)" fill="#2e591d">
+      <rect width="54" height="204" rx="7" fill="#dfecd8" stroke="#387624"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">FC 1 568 → 64</text>
+        <text text-anchor="middle" y="16" font-size="16">После развёртки</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">64</text>
+    </g>
+    <g transform="translate(310 110)" fill="#5e3d8a">
+      <rect width="54" height="204" rx="7" fill="#ede2f8" stroke="#8a65bb"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Латентный код z</text>
+        <text text-anchor="middle" y="16" font-size="16">Из μ и ℓ</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">32</text>
+    </g>
+
+    <g transform="translate(408 110)" fill="#2e591d">
+      <rect width="54" height="204" rx="7" fill="#dfecd8" stroke="#387624"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">FC 32 → 1 568</text>
+        <text text-anchor="middle" y="16" font-size="16">ReLU · смена формы</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">7×7×32</text>
+    </g>
+    <g transform="translate(480 110)" fill="#254f99">
+      <rect width="54" height="204" rx="7" fill="#d9e7fa" stroke="#447fe4"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">ConvT 4×4 · 32 → 16</text>
+        <text text-anchor="middle" y="16" font-size="16">ReLU</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">14×14×16</text>
+    </g>
+    <g transform="translate(552 110)" fill="#254f99">
+      <rect width="54" height="204" rx="7" fill="#d9e7fa" stroke="#447fe4"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="7">ConvT 4×4 · 16 → 1</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">28×28×1</text>
+    </g>
+    <g transform="translate(624 110)" fill="#95343a">
+      <rect width="54" height="204" rx="7" fill="#f7d7d7" stroke="#db5d61"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Сигмоида</text>
+        <text text-anchor="middle" y="16" font-size="16">Яркости в [0, 1]</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">28×28×1</text>
+    </g>
+
+    <g transform="translate(724 110)" fill="#474746">
+      <rect width="54" height="204" rx="7" fill="#e7e7e7" stroke="#4a4a4a"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Изображение</text>
+        <text text-anchor="middle" y="16" font-size="16">При обучении</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">28×28×1</text>
+    </g>
+    <g transform="translate(796 110)" fill="#924500">
+      <rect width="54" height="204" rx="7" fill="#fce5cf" stroke="#ef942c"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Conv 4×4 · 1 → 16</text>
+        <text text-anchor="middle" y="16" font-size="16">Leaky ReLU</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">14×14×16</text>
+    </g>
+    <g transform="translate(868 110)" fill="#924500">
+      <rect width="54" height="204" rx="7" fill="#fce5cf" stroke="#ef942c"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">Conv 4×4 · 16 → 32</text>
+        <text text-anchor="middle" y="16" font-size="16">Leaky ReLU</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">7×7×32</text>
+    </g>
+    <g transform="translate(940 110)" fill="#2e591d">
+      <rect width="54" height="204" rx="7" fill="#dfecd8" stroke="#387624"/>
+      <g transform="translate(27 102) rotate(-90)" font-size="20">
+        <text text-anchor="middle" y="-4">FC 1 568 → 1</text>
+        <text text-anchor="middle" y="16" font-size="16">После развёртки · логит</text>
+      </g>
+      <text class="shape" transform="translate(27 215) rotate(-90)" y="6" fill="#62625e" font-size="17" text-anchor="end">1</text>
+    </g>
+  </g>
+</svg>

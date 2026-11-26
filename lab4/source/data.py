@@ -16,6 +16,7 @@ MIRRORS = (
 
 
 def fetch_images(filename):
+    # Сначала ищем уже скачанный архив из второй лабораторной.
     archive = ROOT.parent / "lab2" / "data" / f"{filename}.gz"
     if archive.is_file():
         return gzip.decompress(archive.read_bytes())
@@ -31,15 +32,18 @@ def fetch_images(filename):
 
 
 def load_images(*, train):
+    # Обучение и оценка используют официальные раздельные части MNIST.
     filename = "train-images-idx3-ubyte" if train else "t10k-images-idx3-ubyte"
     expected = 60_000 if train else 10_000
     path = DATA_DIR / filename
     cached = path.exists()
     data = path.read_bytes() if cached else fetch_images(filename)
+    # Заголовок IDX содержит тип файла, число изображений, высоту и ширину.
     if len(data) != 16 + expected * 28 * 28 or struct.unpack_from(">IIII", data) != (2051, expected, 28, 28):
         raise ValueError(f"Неверный формат изображений MNIST: {path}")
 
     if not cached:
+        # Публикуем локальную копию только после полной записи временного файла.
         DATA_DIR.mkdir(parents=True, exist_ok=True)
         with NamedTemporaryFile(dir=DATA_DIR, delete=False) as file:
             temporary = Path(file.name)
@@ -49,4 +53,5 @@ def load_images(*, train):
         finally:
             temporary.unlink(missing_ok=True)
 
+    # Пропускаем 16 байт заголовка. У изображения один канал яркости с целыми значениями от 0 до 255.
     return np.frombuffer(data, dtype=np.uint8, offset=16).reshape(expected, 28, 28, 1)

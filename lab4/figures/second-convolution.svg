@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 449" role="img" aria-labelledby="title desc">
+  <title id="title">Как вторая свёртка получает одно число на фильтр</title>
+  <desc id="desc">В одной позиции каждого из 16 входных каналов выделено окно 4 на 4. Показаны каналы 1, 2 и 16. Их окна умножаются по клеткам на разные таблицы весов первого фильтра. 256 произведений складываются с одним смещением и дают одну клетку первой выходной карты. Внизу показаны 32 значения той же позиции, по одному из каждой выходной карты.</desc>
+
+  <defs>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #202635; }
+      .heading { font-size: 19px; font-weight: 600; }
+      .label { font-size: 16px; }
+      .secondary { font-size: 15px; fill: #4d5969; }
+      .grid { fill: none; stroke: #b5bfcc; stroke-width: 1; }
+      .connector { fill: none; stroke: #526176; stroke-width: 1.5; }
+    </style>
+    <g id="map-window">
+      <rect width="70" height="70" fill="#f4f6f8"/>
+      <rect x="20" y="20" width="40" height="40" fill="#cddff7"/>
+      <path class="grid" d="M0 0H70V70H0Z M10 0v70 M20 0v70 M30 0v70 M40 0v70 M50 0v70 M60 0v70 M0 10h70 M0 20h70 M0 30h70 M0 40h70 M0 50h70 M0 60h70"/>
+      <rect x="20" y="20" width="40" height="40" fill="none" stroke="#356db2" stroke-width="2"/>
+    </g>
+    <g id="weights">
+      <rect width="40" height="40" fill="#ede4f7" stroke="#895aa8" stroke-width="1.4"/>
+      <path d="M10 0v40 M20 0v40 M30 0v40 M0 10h40 M0 20h40 M0 30h40" fill="none" stroke="#a67dbf"/>
+    </g>
+    <g id="four-cells" fill="#cddff7">
+      <rect width="20" height="15" rx="2"/>
+      <rect x="24" width="20" height="15" rx="2"/>
+      <rect x="48" width="20" height="15" rx="2"/>
+      <rect x="72" width="20" height="15" rx="2"/>
+    </g>
+    <g id="dots" fill="#66758a">
+      <circle cy="-5" r="1.5"/>
+      <circle r="1.5"/>
+      <circle cy="5" r="1.5"/>
+    </g>
+    <marker id="arrow" orient="auto" refX="8" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse">
+      <path class="connector" d="M2 1L8 5 2 9" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="820" height="449" rx="12" fill="#fff"/>
+
+  <g text-anchor="middle">
+    <text class="heading" x="141" y="29">16 входных карт</text>
+    <text class="secondary" x="141" y="51">Окна 4×4</text>
+    <text class="heading" x="285" y="29">Фильтр №1</text>
+    <text class="secondary" x="285" y="51">Веса 4×4 на канал</text>
+  </g>
+
+  <g>
+    <use href="#map-window" x="106" y="70"/>
+    <use href="#map-window" x="106" y="154"/>
+    <use href="#map-window" x="106" y="261"/>
+    <use href="#weights" x="265" y="85"/>
+    <use href="#weights" x="265" y="169"/>
+    <use href="#weights" x="265" y="276"/>
+    <use href="#dots" x="141" y="242"/>
+    <use href="#dots" x="285" y="242"/>
+    <use href="#dots" x="431" y="242"/>
+  </g>
+
+  <g class="label" text-anchor="end">
+    <text x="91" y="111">Канал 1</text>
+    <text x="91" y="195">Канал 2</text>
+    <text x="91" y="302">Канал 16</text>
+  </g>
+  <g font-size="25" text-anchor="middle">
+    <text x="220" y="113">×</text>
+    <text x="220" y="197">×</text>
+    <text x="220" y="304">×</text>
+  </g>
+
+  <g class="connector" marker-end="url(#arrow)">
+    <path d="M322 105h34"/>
+    <path d="M322 189h34"/>
+    <path d="M322 296h34"/>
+  </g>
+  <g class="label">
+    <text x="369" y="111">16 произведений</text>
+    <text x="369" y="195">16 произведений</text>
+    <text x="369" y="302">16 произведений</text>
+  </g>
+
+  <path class="connector" d="M511 105h12v191h-12 M511 189h12"/>
+  <path class="connector" d="M523 189h129" marker-end="url(#arrow)"/>
+  <g text-anchor="middle">
+    <text class="heading" x="587" y="139">Сложить 256</text>
+    <text class="label" x="587" y="162">произведений</text>
+    <text class="label" x="587" y="216">+ смещение b₁</text>
+    <text class="secondary" x="587" y="237">один раз</text>
+  </g>
+
+  <g text-anchor="middle">
+    <text class="heading" x="719" y="122">Карта №1 · 7×7</text>
+    <text class="label" x="719" y="260">Клетка (i, j)</text>
+  </g>
+  <g transform="translate(673 143)">
+    <rect width="91" height="91" fill="#f4f6f8"/>
+    <path class="grid" d="M0 0H91V91H0Z M13 0v91 M26 0v91 M39 0v91 M52 0v91 M65 0v91 M78 0v91 M0 13h91 M0 26h91 M0 39h91 M0 52h91 M0 65h91 M0 78h91"/>
+    <rect x="39" y="39" width="13" height="13" fill="#356db2"/>
+  </g>
+
+  <path d="M28 349H792" stroke="#d5dbe3"/>
+  <text class="heading" x="28" y="378">32 числа в одной позиции (i, j)</text>
+  <text class="secondary" x="792" y="378" text-anchor="end">По одному на каждый фильтр</text>
+  <g>
+    <use href="#four-cells" x="28" y="392"/>
+    <use href="#four-cells" x="124" y="392"/>
+    <use href="#four-cells" x="220" y="392"/>
+    <use href="#four-cells" x="316" y="392"/>
+    <use href="#four-cells" x="412" y="392"/>
+    <use href="#four-cells" x="508" y="392"/>
+    <use href="#four-cells" x="604" y="392"/>
+    <use href="#four-cells" x="700" y="392"/>
+    <rect x="28" y="392" width="20" height="15" rx="2" fill="#356db2"/>
+  </g>
+  <text class="secondary" x="28" y="431">Канал 1</text>
+  <text class="secondary" x="792" y="431" text-anchor="end">Канал 32</text>
+</svg>
